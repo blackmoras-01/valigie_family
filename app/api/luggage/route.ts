@@ -1,32 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { put, list } from '@vercel/blob';
+
+const BLOB_KEY = 'luggage/counts.json';
 
 const DEFAULT: Record<string, number> = {
   milan: 0, eindhoven: 0, barcelona: 0, zanzibar: 0,
 };
 
-// In-memory fallback for local development (resets on server restart).
-// On Vercel, add the Vercel KV integration so data persists across users.
+// In-memory fallback for local dev (resets on restart, fine for testing)
 const memStore: Record<string, number> = { ...DEFAULT };
 
-async function useKV(): Promise<boolean> {
-  return !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
-}
-
 async function readAll(): Promise<Record<string, number>> {
-  if (await useKV()) {
-    const { kv } = await import('@vercel/kv');
-    return (await kv.get<Record<string, number>>('luggage')) ?? { ...DEFAULT };
+  if (!process.env.BLOB_READ_WRITE_TOKEN) return { ...memStore };
+  try {
+    const { blobs } = await list({ prefix: BLOB_KEY });
+    if (blobs.length === 0) return { ...DEFAULT };
+    const res = await fetch(blobs[0].url, { cache: 'no-store' });
+    return await res.json();
+  } catch {
+    return { ...DEFAULT };
   }
-  return { ...memStore };
 }
 
 async function writeAll(data: Record<string, number>): Promise<void> {
-  if (await useKV()) {
-    const { kv } = await import('@vercel/kv');
-    await kv.set('luggage', data);
-  } else {
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
     Object.assign(memStore, data);
+    return;
   }
+  await put(BLOB_KEY, JSON.stringify(data), {
+    access: 'public',
+    addRandomSuffix: false,
+  });
 }
 
 export async function GET() {
