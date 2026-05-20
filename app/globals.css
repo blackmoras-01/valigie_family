@@ -121,20 +121,50 @@ html, body {
 .popup-btn:active:not(:disabled) { transform: scale(0.88); }
 .popup-btn:disabled { opacity: 0.25; cursor: default; }
 
-.popup-center {
+/* ── Luggage rows inside popup ─────────────────────────────────────────── */
+.luggage-row {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 2px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
 }
 
-.popup-icon { font-size: 26px; line-height: 1; }
+.luggage-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+}
+
+.luggage-icon { font-size: 20px; line-height: 1; }
+
+.luggage-type-text {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.luggage-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 .popup-count {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
   color: #ffffff;
+  min-width: 24px;
+  text-align: center;
   letter-spacing: -0.5px;
+}
+
+.popup-divider {
+  height: 1px;
+  background: rgba(0, 212, 255, 0.12);
+  margin: 6px 0;
 }
 
 /* ── Header ────────────────────────────────────────────────────────────── */
