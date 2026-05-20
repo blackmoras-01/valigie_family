@@ -1,26 +1,166 @@
-@import "tailwindcss";
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #020810;
+  font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+  color: #e0f4ff;
+  -webkit-font-smoothing: antialiased;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Pin badge ─────────────────────────────────────────────────────────── */
+.pin-badge {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  cursor: pointer;
+  z-index: 10;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.badge-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 6px;
+  border-radius: 50px;
+  background: rgba(0, 180, 220, 0.12);
+  border: 1.5px solid rgba(0, 212, 255, 0.7);
+  color: #00d4ff;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 10px rgba(0, 212, 255, 0.35),
+    inset 0 0 6px rgba(0, 212, 255, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  user-select: none;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.pin-badge:hover .badge-num {
+  transform: scale(1.25);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.65),
+    inset 0 0 8px rgba(0, 212, 255, 0.15);
+}
+
+/* ── Popup ─────────────────────────────────────────────────────────────── */
+.pin-popup {
+  position: fixed;
+  z-index: 50;
+  transform: translate(-50%, calc(-100% - 18px));
+  background: rgba(4, 12, 28, 0.92);
+  border: 1px solid rgba(0, 212, 255, 0.25);
+  border-radius: 18px;
+  padding: 18px 22px 20px;
+  min-width: 190px;
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 16px 48px rgba(0, 0, 0, 0.7),
+    0 0 24px rgba(0, 212, 255, 0.08);
+}
+
+.popup-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: rgba(0, 212, 255, 0.4);
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0;
+  transition: color 0.15s;
+}
+.popup-close:hover { color: rgba(0, 212, 255, 0.9); }
+
+.popup-city {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(0, 212, 255, 0.6);
+  margin-bottom: 14px;
+}
+
+.popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.popup-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0, 212, 255, 0.3);
+  background: rgba(0, 212, 255, 0.07);
+  color: #00d4ff;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, box-shadow 0.15s, transform 0.1s;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.popup-btn:hover:not(:disabled) {
+  background: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 14px rgba(0, 212, 255, 0.4);
+}
+.popup-btn:active:not(:disabled) { transform: scale(0.88); }
+.popup-btn:disabled { opacity: 0.25; cursor: default; }
+
+.popup-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.popup-icon { font-size: 26px; line-height: 1; }
+
+.popup-count {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────── */
+.site-header {
+  position: fixed;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 20;
+  pointer-events: none;
+  user-select: none;
+}
+
+.site-header h1 {
+  font-size: 18px;
+  font-weight: 300;
+  letter-spacing: 8px;
+  color: rgba(255, 255, 255, 0.75);
+  text-transform: uppercase;
+}
+
+.site-header p {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: rgba(0, 212, 255, 0.45);
+  margin-top: 3px;
+  text-transform: uppercase;
 }
