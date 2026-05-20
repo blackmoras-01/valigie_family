@@ -26,9 +26,9 @@ interface PopupState {
   y: number;
 }
 
-interface GlobeProps {
-  initialCounts: Record<string, number>;
-}
+const DEFAULT_COUNTS: Record<string, number> = {
+  milan: 0, eindhoven: 0, barcelona: 0, zanzibar: 0,
+};
 
 function latLonToVec3(lat: number, lon: number, r = 1.012): THREE.Vector3 {
   const phi = (90 - lat) * (Math.PI / 180);
@@ -40,12 +40,12 @@ function latLonToVec3(lat: number, lon: number, r = 1.012): THREE.Vector3 {
   );
 }
 
-export default function Globe({ initialCounts }: GlobeProps) {
+export default function Globe() {
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const popupElRef = useRef<HTMLDivElement>(null);
 
-  const countsRef = useRef<Record<string, number>>({ ...initialCounts });
+  const countsRef = useRef<Record<string, number>>({ ...DEFAULT_COUNTS });
 
   // Three.js refs shared between useEffect and callbacks
   const sceneRef = useRef<{
@@ -350,6 +350,18 @@ export default function Globe({ initialCounts }: GlobeProps) {
       renderer.render(scene, camera);
     };
     animate();
+
+    // Fetch latest counts from API (client-side, so auth cookies are included)
+    fetch('/api/luggage')
+      .then(r => r.json())
+      .then((data: Record<string, number>) => {
+        countsRef.current = { ...DEFAULT_COUNTS, ...data };
+        CITIES.forEach(city => {
+          const badge = overlay.querySelector(`[data-city="${city.id}"] .badge-num`) as HTMLElement | null;
+          if (badge) badge.textContent = String(countsRef.current[city.id] ?? 0);
+        });
+      })
+      .catch(() => {});
 
     return () => {
       cancelAnimationFrame(rafId);
