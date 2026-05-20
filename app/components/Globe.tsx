@@ -51,7 +51,7 @@ export default function Globe({ initialCounts }: GlobeProps) {
   const sceneRef = useRef<{
     globeGroup: THREE.Group;
     camera: THREE.PerspectiveCamera;
-    pinMeshes: Array<THREE.Mesh & { userData: { city: City } }>;
+    pinMeshes: THREE.Mesh[];
   } | null>(null);
 
   const [popup, setPopup] = useState<PopupState>({
@@ -180,7 +180,8 @@ export default function Globe({ initialCounts }: GlobeProps) {
     ));
 
     // ── Pins ───────────────────────────────────────────────────────────────
-    const pinMeshes: Array<THREE.Mesh & { userData: { city: City } }> = [];
+    const pinMeshes: THREE.Mesh[] = [];
+    const pinCityMap = new Map<string, City>();
     const pulseRings: THREE.Mesh[] = [];
 
     CITIES.forEach((city, idx) => {
@@ -190,9 +191,9 @@ export default function Globe({ initialCounts }: GlobeProps) {
       const dot = new THREE.Mesh(
         new THREE.SphereGeometry(0.022, 16, 16),
         new THREE.MeshBasicMaterial({ color: 0x00d4ff }),
-      ) as THREE.Mesh & { userData: { city: City } };
+      );
       dot.position.copy(pos);
-      dot.userData.city = city;
+      pinCityMap.set(dot.uuid, city);
       globeGroup.add(dot);
       pinMeshes.push(dot);
 
@@ -281,8 +282,9 @@ export default function Globe({ initialCounts }: GlobeProps) {
       ray.setFromCamera(mouse, camera);
       const hits = ray.intersectObjects(pinMeshes);
       if (hits.length > 0) {
-        const hit = hits[0].object as (typeof pinMeshes)[0];
-        openPopup(hit.userData.city, hit);
+        const hit = hits[0].object as THREE.Mesh;
+        const city = pinCityMap.get(hit.uuid);
+        if (city) openPopup(city, hit);
       } else {
         setPopup(p => ({ ...p, visible: false }));
       }
